@@ -10,6 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import redis.clients.jedis.Jedis;
 
+import com.wkl.api.AssetService;
 import com.wkl.api.CallService;
 import com.wkl.api.InventoryService;
 import com.wkl.api.OrderService;
@@ -25,9 +26,10 @@ public class Consumer {
 	private long datacenterId = 00001L; 
 	
 	//库存可以用redis去实现
-    InventoryService products;
-    OrderService orderService;
-    SerialNumGenerato generato;
+    private InventoryService products;
+    private OrderService orderService;
+    private SerialNumGenerato generato;
+    private AssetService assetService;
     Jedis jedis;
     
     //当做调用接口入参
@@ -55,6 +57,12 @@ public class Consumer {
             GoodOrder goodOrder = new GoodOrder(id, productId, productName, userId, userName, balance, time);
             if(orderService.OrderAdd(goodOrder)) {
             	System.out.println("成功");
+            	if(assetService.getAssetInfo(1).getCurrentCash() >= balance){
+            		assetService.updateAssetInfo(balance); //更新账号资产
+            	} else {
+            		//需要回滚订单
+            	}
+            	
             }
             else {
             	System.out.println("失败");
@@ -74,6 +82,7 @@ public class Consumer {
         products = context.getBean(InventoryService.class);
         orderService = context.getBean(OrderService.class);
         generato = context.getBean(SerialNumGenerato.class);
+        assetService = context.getBean(AssetService.class);
         jedis = new Jedis("localhost");
         getProductToCache();
 	}

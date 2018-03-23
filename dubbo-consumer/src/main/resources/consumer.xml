@@ -11,4 +11,5 @@
     <dubbo:reference id="permissionService" interface="com.wkl.api.CallService"/>
     <dubbo:reference id="inventoryService" interface="com.wkl.api.InventoryService"/>
     <dubbo:reference id="OrderService" interface="com.wkl.api.OrderService"/>
+    <dubbo:reference id="AssetService" interface="com.wkl.api.AssetService"/>
 </beans>
